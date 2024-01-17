@@ -34,6 +34,7 @@ const config: Config = {
           routeBasePath: '/',
           sidebarPath: './sidebars.ts',
           editUrl: 'https://github.com/linqgg/docs/tree/main/docs/',
+          // disableVersioning: true,
           // lastVersion: 'current',
           // versions: {
           //   current: {
@@ -82,12 +83,12 @@ const config: Config = {
           type: 'localeDropdown',
           position: 'right',
         },
-        {
-          type: 'docsVersionDropdown',
-          position: 'right',
-          dropdownItemsAfter: [{to: '/versions', label: 'All versions'}],
-          dropdownActiveClassDisabled: true,
-        },
+        // {
+        //   type: 'docsVersionDropdown',
+        //   position: 'right',
+        //   dropdownItemsAfter: [{to: '/versions', label: 'All versions'}],
+        //   dropdownActiveClassDisabled: true,
+        // },
         {
           href: 'https://github.com/linqgg/docs',
           label: 'GitHub',
