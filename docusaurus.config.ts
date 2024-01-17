@@ -34,6 +34,13 @@ const config: Config = {
           routeBasePath: '/',
           sidebarPath: './sidebars.ts',
           editUrl: 'https://github.com/linqgg/docs/tree/main/docs/',
+          // lastVersion: 'current',
+          // versions: {
+          //   current: {
+          //     label: '1.0.0',
+          //     path: '1.0.0',
+          //   },
+          // },
         },
         blog: false,
         theme: {
@@ -47,11 +54,12 @@ const config: Config = {
     // Replace with your project's social card
     image: 'img/docusaurus-social-card.jpg',
     navbar: {
-      title: 'LinQ Wallet Documentation',
+      title: 'LinQ Wallet Docs',
       logo: {
-        alt: 'My Site Logo',
-        src: 'img/logo.svg',
+        alt: 'LinQ Wallet Logo',
+        src: 'img/logo.png',
       },
+      
       items: [
         {
           type: 'docSidebar',
@@ -59,9 +67,29 @@ const config: Config = {
           position: 'left',
           label: 'Documentation',
         },
-        {to: '/intro', label: 'SDK', position: 'left'},
+        
         {
-          href: 'https://github.com/facebook/docusaurus',
+          href: 'https://buf.build/linq/linq', 
+          label: 'API SDK on Buf', 
+          position: 'left'
+        },
+        {
+          href: 'https://linq.gg/',
+          label: 'Wallet App',
+          position: 'left'
+        },
+        {
+          type: 'localeDropdown',
+          position: 'right',
+        },
+        {
+          type: 'docsVersionDropdown',
+          position: 'right',
+          dropdownItemsAfter: [{to: '/versions', label: 'All versions'}],
+          dropdownActiveClassDisabled: true,
+        },
+        {
+          href: 'https://github.com/linqgg/docs',
           label: 'GitHub',
           position: 'right',
         },
@@ -93,6 +121,15 @@ const config: Config = {
             {
               label: 'Twitter',
               href: 'https://twitter.com/docusaurus',
+            },
+          ],
+        },
+        {
+          title: 'More',
+          items: [
+            {
+              label: 'GitHub',
+              href: 'https://github.com/linkgg/docs',
             },
           ],
         },
