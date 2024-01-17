@@ -22,7 +22,7 @@ description: Описание процесса регистрации польз
 
 Сразу после регистрации пользователя в игре или первого входа, стоит его зарегистрировать в LinQ Wallet, чтобы у него была возможность пополнять свой счет.
 
-Для начала необходимо зарегистрировать запрос от стороннего сервиса и получить токен доступа ([Access Token](./#access-token)) для выполнения регистрации.
+Для начала необходимо зарегистрировать запрос от стороннего сервиса и получить токен доступа (Access Token) для выполнения регистрации.
 
 Для получения токена используется сервис [AuthGameService](https://buf.build/linq/linq/docs/main:linq.auth.game.v1#linq.auth.game.v1.AuthGameService) и метод [SignInGame](https://buf.build/linq/linq/docs/main:linq.auth.game.v1#linq.auth.game.v1.AuthGameService.SignInGame).
 

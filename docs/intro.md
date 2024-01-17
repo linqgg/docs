@@ -15,9 +15,9 @@ description: Общее описание взаимодействий с сер�
 
 Интеграция через приложение включает в себя следующие модули:
 
-* [registraciya-i-avtorizaciya](sections/registraciya-i-avtorizaciya/ "mention")
-* [proverka-mestopolozheniya.md](sections/proverka-mestopolozheniya.md "mention")
-* [denezhnye-operacii.md](sections/denezhnye-operacii.md "mention")
+* [registraciya-i-avtorizaciya](modules/auth.md "mention")
+* [proverka-mestopolozheniya.md](modules/location.md "mention")
+* [denezhnye-operacii.md](modules/money.md "mention")
 
 Для интеграции используется протокол вызова процедур gRPC совместно с Protocol Buffers.&#x20;
 
@@ -25,7 +25,7 @@ description: Общее описание взаимодействий с сер�
 
 Технические детали подключения к сервисам LinQ Wallet описаны на страницах:
 
-* &#x20;[bystryi-start.md](bystryi-start.md "mention")
+<!-- * &#x20;[bystryi-start.md](bystryi-start.md "mention") -->
 
 ### Режимы использования
 
