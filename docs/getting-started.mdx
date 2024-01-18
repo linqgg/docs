@@ -1,0 +1,123 @@
+---
+sidebar_position: 2
+description: This section describes the technical aspects required to begin integration.
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Getting Started
+
+:::warning
+The full implementation and description of the API Reference is still in progress and requires some work on our part, but there are no plans to change the method signatures.
+:::
+
+## Access to services
+
+Production and stage environments are available for connection; to start integration, you should use the data for stage.
+
+To gain access to the environment, a special token is required, which is generated upon request. It is used for the initial connection between services, then authorization occurs through user tokens.
+
+<Tabs>
+  <TabItem value="stage" label="Stage" default>
+    ```
+      services-stage-mx6hvkth4a-uc.a.run.app
+      services.stage.galactica.games
+    ```
+  </TabItem>
+  <TabItem value="Production" label="Production" default>
+    ```
+      services.galactica.games
+    ```
+  </TabItem>
+</Tabs>
+
+
+## Install dependencies
+
+This tutorial provides integration examples for NodeJS and TypeScript.
+
+To get started, install the [@protobuf-ts/grpc-transport](https://www.npmjs.com/package/@protobuf-ts/grpc-transport) and [@grpc/grpc-js](https://www.npmjs.com/package/@grpc/grpc-js)
+
+```bash
+# Install via NPM
+npm install --save @grpc/grpc-js
+npm install --save @protobuf-ts/grpc-transport
+```
+
+#### Transport and authorization
+
+To work with gRPC, you need to create two auxiliary functions to create a container for sending commands to a remote service and for authorization. Optional, but improves usability.
+
+```typescript
+import { GrpcTransport } from "@protobuf-ts/grpc-transport";
+import { RpcOptions } from "@protobuf-ts/runtime-rpc";
+import { ChannelCredentials } from "@grpc/grpc-js";
+
+export const getTransport = (): GrpcTransport => {
+  const host = process.env.SERVICES_API_URL ?? "";
+  return new GrpcTransport({
+    host,
+    channelCredentials: host.includes('localhost')
+      ? ChannelCredentials.createInsecure()
+      : ChannelCredentials.createSsl(),
+  });
+};
+
+export const getAuthorization = (accessToken: string): RpcOptions => {
+  return {
+    meta: {
+      authorization: `Bearer ${accessToken}`
+    }
+  };
+};
+```
+
+
+:::info
+Please note that this example uses the `SERVICES_API_URL` environment variable. If your name for this variable is different, you need to edit the example code to suit your needs.
+:::
+
+## First request
+
+As a test initial request, you can use a request to the location service by IP address. It does not require authorization.
+
+To begin with, you should download the generated client for this service, unpack it and copy it to the `src/services` folder.
+
+// link to file that can be downloaded
+Client for location service
+
+Below is an example of using a client to call the necessary methods on the service, in this case to obtain information about the current location and a flag that indicates whether access is allowed or not.
+
+```typescript
+// Import response type
+import { Access } from "./services/system/v1alpha1/restrictions";
+// Import service client for connecting to the backend
+import { RestrictionsServiceClient } from "./services/system/v1alpha1/restrictions.client";
+// Import special helpers for building transport and auth
+import { getAuthorization, getTransport } from "./utils/transport";
+
+export const accessChecker = async (): Promise<Access> => {
+  // creates service instance using transport as a parameter
+  const service = new RestrictionsServiceClient(getTransport());
+  
+  const access = await service.isAccessAllowed({});
+  // in case authorization needed, use the next way of doing request
+  // auth token - token, which backend gives for user oprations
+  // const access = await service.isAccessAllowed({}, getAuthorization('auth token'));
+
+  return access.response;
+}
+
+accessChecker().then((access: Access) => {
+  console.log(access);
+  // will return similar to
+  // { allowed: true, location: { country: 'US', region: 'CA', city: 'Palo Alto' } }
+});
+```
+
+
+An example application for checking a location is attached below as an archive.
+
+link to file 
+src=".gitbook/assets/integration-sdk-example.zip"

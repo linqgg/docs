@@ -4,7 +4,6 @@ import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
   title: 'LinQ Wallet Documentation',
-  tagline: 'Dinosaurs are cool',
   favicon: 'img/favicon.ico',
 
   url: 'https://docs.linq.gg',
@@ -18,32 +17,27 @@ const config: Config = {
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
 
-  // Even if you don't use internationalization, you can use this field to set
-  // useful metadata like html lang. For example, if your site is Chinese, you
-  // may want to replace "en" with "zh-Hans".
   i18n: {
     defaultLocale: 'en',
-    locales: ['en', 'ru'],
+    locales: ['en'],
   },
+
+  markdown: {
+    mermaid: true,
+  },
+
+  themes: ['@docusaurus/theme-mermaid'],
 
   presets: [
     [
       'classic',
       {
+        blog: false,
         docs: {
           routeBasePath: '/',
           sidebarPath: './sidebars.ts',
           editUrl: 'https://github.com/linqgg/docs/tree/main/docs/',
-          // disableVersioning: true,
-          // lastVersion: 'current',
-          // versions: {
-          //   current: {
-          //     label: '1.0.0',
-          //     path: '1.0.0',
-          //   },
-          // },
         },
-        blog: false,
         theme: {
           customCss: './src/css/custom.css',
         },
@@ -52,43 +46,50 @@ const config: Config = {
   ],
 
   themeConfig: {
-    // Replace with your project's social card
-    image: 'img/docusaurus-social-card.jpg',
+    // Replace with your project's social card  todo:
+    // image: 'img/docusaurus-social-card.jpg',
     navbar: {
       title: 'LinQ Wallet Docs',
       logo: {
         alt: 'LinQ Wallet Logo',
         src: 'img/logo.png',
       },
-      
       items: [
         {
-          type: 'docSidebar',
-          sidebarId: 'tutorialSidebar',
+          to: '/getting-started',
+          label: 'Getting Started',
           position: 'left',
-          label: 'Documentation',
         },
-        
+        {
+          to: '/modules/authentication',
+          position: 'left',
+          label: 'Auth & Login',
+        },
+        {
+          to: '/modules/location-checks',
+          position: 'left',
+          label: 'Locations',
+        },
+        {
+          to: '/modules/money-operations',
+          position: 'left',
+          label: 'Money',
+        },
+        // {
+        //   to: 'modules/authentication',
+        //   position: 'left',
+        //   label: 'Games',
+        // },
         {
           href: 'https://buf.build/linq/linq', 
           label: 'API SDK on Buf', 
-          position: 'left'
+          position: 'right'
         },
         {
           href: 'https://linq.gg/',
           label: 'Wallet App',
-          position: 'left'
+          position: 'right'
         },
-        {
-          type: 'localeDropdown',
-          position: 'right',
-        },
-        // {
-        //   type: 'docsVersionDropdown',
-        //   position: 'right',
-        //   dropdownItemsAfter: [{to: '/versions', label: 'All versions'}],
-        //   dropdownActiveClassDisabled: true,
-        // },
         {
           href: 'https://github.com/linqgg/docs',
           label: 'GitHub',
@@ -100,34 +101,37 @@ const config: Config = {
       style: 'dark',
       links: [
         {
-          title: 'Docs',
+          title: 'Documentation',
           items: [
             {
-              label: 'Tutorial',
-              to: '/intro',
+              label: 'Authentication',
+              to: '/modules/authentication',
+            },
+            // {
+            //   label: 'Playing Sessions',
+            //   to: '/modules/authentication',
+            // },
+            {
+              label: 'Money Operations',
+              to: '/modules/money-operations',
+            },
+            {
+              label: 'Location Checks',
+              to: '/modules/location-checks',
             },
           ],
         },
         {
-          title: 'Community',
+          title: 'Developers',
           items: [
             {
-              label: 'Stack Overflow',
-              href: 'https://stackoverflow.com/questions/tagged/docusaurus',
+              label: 'Platform SDKs',
+              href: 'https://buf.build/linq/linq',
             },
             {
-              label: 'Discord',
-              href: 'https://discordapp.com/invite/docusaurus',
+              label: 'Buf Studio',
+              href: 'https://buf.build/studio',
             },
-            {
-              label: 'Twitter',
-              href: 'https://twitter.com/docusaurus',
-            },
-          ],
-        },
-        {
-          title: 'More',
-          items: [
             {
               label: 'GitHub',
               href: 'https://github.com/linkgg/docs',
@@ -135,11 +139,32 @@ const config: Config = {
           ],
         },
         {
-          title: 'More',
+          title: 'LinQ Wallet App',
           items: [
             {
-              label: 'GitHub',
-              href: 'https://github.com/linkgg/docs',
+              label: 'Website',
+              href: 'https://linq.gg/',
+            },
+            {
+              label: 'Apple Store',
+              href: 'https://apps.apple.com/us/app/linq-wallet/id6447305486',
+            },
+          ],
+        },
+        {
+          title: 'Legal',
+          items: [
+            {
+              label: 'Privacy Policy',
+              href: 'http://linq.gg/privacy',
+            },
+            {
+              label: 'Terms & Conditions',
+              href: 'http://linq.gg/terms',
+            },
+            {
+              label: 'Contact',
+              href: 'mailto:help@galactica.games',
             },
           ],
         },
@@ -149,6 +174,9 @@ const config: Config = {
     prism: {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
+    },
+    mermaid: {
+      theme: { light: 'neutral', dark: 'forest' },
     },
   } satisfies Preset.ThemeConfig,
 };
