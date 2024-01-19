@@ -1,6 +1,8 @@
 ---
+id: approach
 sidebar_position: 1
 description: Description of the user registration process in the LinQ Wallet system.
+slug: /modules/auth
 ---
 
 # Authentication
@@ -13,7 +15,7 @@ The conditionally anonymous mode gives you the right to create an account in the
 
 The authorized mode removes restrictions and allows you to perform all operations, including transferring money from the game to your wallet (for subsequent withdrawal to a bank account or card). This mode assumes that the user has a full-fledged active account in LinQ Wallet.
 
-To work with the API and organize/restrict access, certain keys and tokens are used. More information about token types can be found on the page [tokens.md](/modules/autherntication/tokens.md "mention").
+To work with the API and organize/restrict access, certain keys and tokens are used. More information about token types can be found on the page [Types of tokens](/modules/auth/tokens).
 
 ## Authorization procedure in LinQ Wallet services
 

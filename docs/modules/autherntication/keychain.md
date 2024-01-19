@@ -1,5 +1,7 @@
 ---
 description: Description of the mechanism for working with tokens through Keychain (Apple) for cases when the wallet application has not yet been installed.
+sidebar_position: 2
+slug: /modules/auth/keychain
 ---
 
 # Storing tokens in Keychain

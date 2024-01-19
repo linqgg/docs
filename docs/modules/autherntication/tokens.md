@@ -1,5 +1,7 @@
 ---
 description: Description of the tokens used and recommendations for their use
+sidebar_position: 1
+slug: /modules/auth/tokens
 ---
 
 # Types of tokens
@@ -10,7 +12,7 @@ Four types of tokens exist and are used to provide access. Two of them are direc
 
 They are used to validate user requests and, based on them, access to certain service functions is provided.
 
-###Access Token
+### Access Token
 
 This token is created upon request from a third-party service and is then used to sign user transactions in LinQ Wallet services. Works in conditional anonymity mode. The token should be saved to the user profile for subsequent operations. The token's lifetime is unlimited.
 

@@ -61,7 +61,7 @@ const config: Config = {
           position: 'left',
         },
         {
-          to: '/modules/authentication',
+          to: '/modules/auth',
           position: 'left',
           label: 'Auth & Login',
         },
@@ -105,7 +105,7 @@ const config: Config = {
           items: [
             {
               label: 'Authentication',
-              to: '/modules/authentication',
+              to: '/modules/auth',
             },
             // {
             //   label: 'Playing Sessions',
