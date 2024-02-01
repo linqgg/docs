@@ -64,6 +64,64 @@ const payload = await service.newReplenishOrder(
 // payload.response.checkout - link to checkout page
 ```
 
+#### Native replenishment
+
+#### Apple Pay
+
+1. [Configure Apple Pay](https://developer.apple.com/documentation/passkit_apple_pay_and_wallet/apple_pay/setting_up_apple_pay)
+   - [Apple developer account](https://developer.apple.com/account/resources/identifiers/list) - Enable Apple Pay Payment Processing for required bundle id, configure Merchant IDs
+   - Xcode - add Apple Pay to Signing & Capabilities, enable Merchant IDs
+   - Possible Merchant IDs
+      - Staging
+      ```
+      merchant.games.galactica.linq-test
+      merchant.games.galactica.linq-2-test
+      ```
+      - Production
+      ```
+      merchant.games.galactica.linq
+      merchant.games.galactica.linq-2
+      ```
+2. Call [newReplenishOrder](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.PaymentsService.newReplenishOrder).
+In response [apple_pay_config](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.ApplePayConfig) field contains data to create [PKPaymentRequest](https://developer.apple.com/documentation/passkit_apple_pay_and_wallet/pkpaymentrequest). Proceed with Apple Pay and get [PKPayment](https://developer.apple.com/documentation/passkit_apple_pay_and_wallet/pkpayment) in response.
+
+3. Call [MakePayment](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.PaymentsService.MakePayment) with data got on the previous step.
+   - apple_pay_payment should contain [payment_data json string](https://developer.apple.com/documentation/passkit_apple_pay_and_wallet/pkpaymenttoken/1617000-paymentdata)
+   - pass billing address data got from [billingContact postalAddress](https://developer.apple.com/documentation/passkit_apple_pay_and_wallet/pkpayment/1619320-billingcontact). Map [Apple CNPostalAddress](https://developer.apple.com/documentation/contacts/cnpostaladdress) to [Buf BillingAddress](https://buf.build/linq/linq/docs/main:linq.shared#linq.shared.BillingAddress)
+      - isoCountryCode -> country
+      - state -> region
+      - city -> city
+      - street -> street
+      - postalCode -> zip
+
+```typescript
+const payload = await service.makePayment(
+  {
+    order_id: 'abcd-efgh' // returned by newReplenishOrder,
+    address: {
+      country: 'US',
+      region: 'CA',
+      city: 'Cupertino',
+      street: 'One Apple Park Way',
+      zip: '95014',
+    },
+    apple_pay_payment: {
+      payment_data: JSON.stringify({
+        version: 'EC_v1',
+        data: 'abcd...',
+        signature: 'abcd...',
+        header: {
+          transactionId: 'abcd...',
+          ephemeralPublicKey: 'abcd...',
+          publicKeyHash: 'abcd...',
+        },
+      }),
+    },
+  },
+  getAuthorization(user.walletToken ?? user.accessToken),
+);
+```
+
 ### Order status
 
 After creating a replenishment order, a link will be returned in response, which must be displayed inside the game using webview. After payment (successful or not), control will be returned back to the application, after which you should make sure what the status of the order is. It can be successfully paid or rejected by the payment system.
