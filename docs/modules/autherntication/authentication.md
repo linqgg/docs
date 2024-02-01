@@ -47,7 +47,7 @@ After this, you can use this token for other requests, for example, to check the
 const accountsService = new AccountsServiceClient(getTransport());
 
 const gamingBalance = await accountsService.getActualBalance(
-    { currency: "GMC" }, 
+    { currency: "GMC" },
     getAuthorization(user.accessToken)
 );
 ```
@@ -147,4 +147,22 @@ const payload = await service.signInGameUser(data, getAuthorization(authToken));
 
 // payload.response.accessToken
 // payload.response.id
+```
+
+## Save game user data to anonymous profile to avoid deposit limits
+
+To avoid [deposit limits](/modules/money-operations#anonymous-profiles) you need to provide user's game account info using [SaveGameUser](https://buf.build/linq/linq/docs/main:linq.auth.user.v1#linq.auth.user.v1.AuthUserService.SaveGameUser)
+
+```typescript
+const service = new AuthUserServiceClient(getTransport());
+
+const payload = await service.saveGameUser({
+    user: {
+        dob: <date_of_birth>,
+        phone: "+11111111",
+        email: "test@test.com"
+        first_name: "Fname"
+        last_name: "Lname"
+    }
+}, getAuthorization(user.accessToken));
 ```

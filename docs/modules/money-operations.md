@@ -157,3 +157,14 @@ To obtain the history of operations (or transactions), you should use the [Opera
 This service provides a list of all orders that were created by the user, allowing them to be used for analysis or display to the user, depending on the needs.
 
 At the time of forming the request, it is possible to filter the data by type of operation (replenishment, rate, reward, etc.) and by status (completed, awaiting payment, etc.). In addition, you can set a time frame for what period you want to obtain data. The default is to return all operations.
+
+## Limits
+
+To check if any money operation limit reached use [IsLimitReached](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.PaymentsService.IsLimitReached)
+
+### Existing limits
+
+#### Anonymous profiles
+
+Current total deposit amount for anonymous profiles is limited to **100.00**.
+To overcome it please [sign in user with LinQ wallet](/modules/auth#authorization-request) or [provide user's game account data](/modules/auth#save-game-user-data-to-anonymous-profile-to-avoid-deposit-limits)
