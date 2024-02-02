@@ -47,7 +47,7 @@ Similar to the process of withdrawing funds, funds are also credited to a specif
 
 When working with payments, the API operates with the concept of Order. The order stores information in general about the user's intent and the order goes through processing stages where additional technical information is added to it. The order works similarly to orders in e-commerce, but taking into account the specifics of the game. The [PaymentsService](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.PaymentsService) service is responsible for the formation and processing of orders.
 
-### Replenishment
+### Replenishment with checkout page
 
 To replenish money, you need to create a replenishment order, where you need to indicate the amount to replenish, to which internal account the amount should be credited (usually the game account) and additional parameters for subsequent tracking of the order, if required.
 
@@ -64,7 +64,7 @@ const payload = await service.newReplenishOrder(
 // payload.response.checkout - link to checkout page
 ```
 
-#### Native replenishment
+### Native replenishment
 
 #### Apple Pay
 
@@ -82,10 +82,11 @@ const payload = await service.newReplenishOrder(
       merchant.games.galactica.linq
       merchant.games.galactica.linq-2
       ```
-2. Call [newReplenishOrder](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.PaymentsService.newReplenishOrder).
-In response [apple_pay_config](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.ApplePayConfig) field contains data to create [PKPaymentRequest](https://developer.apple.com/documentation/passkit_apple_pay_and_wallet/pkpaymentrequest). Proceed with Apple Pay and get [PKPayment](https://developer.apple.com/documentation/passkit_apple_pay_and_wallet/pkpayment) in response.
+2. Call [newReplenishOrder](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.PaymentsService.newReplenishOrder) to initiate order and get [apple_pay_config](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.OrderStatusResponse).
 
-3. Call [MakePayment](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.PaymentsService.MakePayment) with data got on the previous step.
+3. Build [PKPaymentRequest](https://developer.apple.com/documentation/passkit_apple_pay_and_wallet/pkpaymentrequest) using data from [apple_pay_config](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.ApplePayConfig). Proceed with Apple Pay and get [PKPayment](https://developer.apple.com/documentation/passkit_apple_pay_and_wallet/pkpayment) in response.
+
+4. Call [MakePayment](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.PaymentsService.MakePayment) with data got on the previous step.
    - apple_pay_payment should contain [payment_data json string](https://developer.apple.com/documentation/passkit_apple_pay_and_wallet/pkpaymenttoken/1617000-paymentdata)
    - pass billing address data got from [billingContact postalAddress](https://developer.apple.com/documentation/passkit_apple_pay_and_wallet/pkpayment/1619320-billingcontact). Map [Apple CNPostalAddress](https://developer.apple.com/documentation/contacts/cnpostaladdress) to [Buf BillingAddress](https://buf.build/linq/linq/docs/main:linq.shared#linq.shared.BillingAddress)
       - isoCountryCode -> country
@@ -97,7 +98,9 @@ In response [apple_pay_config](https://buf.build/linq/linq/docs/main:linq.money.
 ```typescript
 const payload = await service.makePayment(
   {
-    order_id: 'abcd-efgh' // returned by newReplenishOrder,
+    // newReplenishOrder OrderStatusResponse id
+    orderId: 'abcd-efgh'
+    // PKPayment billingContact postalAddress
     address: {
       country: 'US',
       region: 'CA',
@@ -105,8 +108,9 @@ const payload = await service.makePayment(
       street: 'One Apple Park Way',
       zip: '95014',
     },
-    apple_pay_payment: {
-      payment_data: JSON.stringify({
+    applePayPayment: {
+      // PKPayment token paymentData
+      paymentData: JSON.stringify({
         version: 'EC_v1',
         data: 'abcd...',
         signature: 'abcd...',
@@ -120,6 +124,71 @@ const payload = await service.makePayment(
   },
   getAuthorization(user.walletToken ?? user.accessToken),
 );
+
+// payload.response.success - is transaction was successful
+// payload.response.order - order info
+```
+
+#### Card
+
+1. Implement screens to collect card data (number, expiration date, cvv, holder name) and billing address (country, region/state, city, street address, zip/postal code)
+2. Integrate [Kount DDC](https://developer.kount.com/hc/en-us/sections/5319287642260-Integration-Guide?article=4411149718676) (to collect data for fraud prevention)
+3. Call [newReplenishOrder](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.PaymentsService.newReplenishOrder) to initiate order and get [tokenex_config and kount_config](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.OrderStatusResponse).
+4. Make request to [Tokenex Mobile Api](https://docs.tokenex.com/docs/tokenize-with-cvv) using data from [tokenex_config](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.TokenexConfig) and card number with cvv to get Tokenex token and tokenHmac
+```typescript
+const response = await httpClient.post(tokenexConfig.url, {
+  tokenexid: tokenexConfig.tokenexId,
+  timestamp: tokenexConfig.timestamp,
+  authenticationKey: tokenexConfig.authenticationKey,
+  tokenScheme: tokenexConfig.tokenScheme,
+  data: '4242424242424242',
+  cvv: '123',
+});
+
+// response.Token
+// response.TokenHMAC
+```
+5. Initiate [Kount DDC](https://developer.kount.com/hc/en-us/sections/5319287642260-Integration-Guide?article=4411149718676) with data from [kount_config](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.KountConfig), call `collect` and get kount `sessionId`.
+6. Call [MakePayment](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.PaymentsService.MakePayment) with [card](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.CardTokenexPayment), [address](https://buf.build/linq/linq/docs/5cdbcb323d77420d84adb6c08aab4d4c/linq.shared#linq.shared.BillingAddress) and [kount](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.KountData) data.
+```typescript
+const payload = await service.makePayment(
+  {
+    // newReplenishOrder OrderStatusResponse id
+    orderId: 'abcd-efgh'
+    // Billing address
+    address: {
+      country: 'US',
+      region: 'CA',
+      city: 'Cupertino',
+      street: 'One Apple Park Way',
+      zip: '95014',
+    },
+    cardTokenexPayment: {
+      // token from Tokenize Mobile Api response
+      token: '424242ABCDEF4242',
+      // tokenHmac from Tokenize Mobile Api response
+      tokenHmac: 'tokenHmac',
+      // card expiration year
+      expYear: '28',
+      // card expiration month
+      expMonth: '12',
+      // card holder name
+      cardHolderName: 'Galactica Games',
+      kountData: {
+        // sessionId from Kount DDC collect
+        sessionId: '1234',
+        // first 6 card digits,
+        firstSix: '424242',
+        // last 4 card digits,
+        lastFour: '4242',
+      },
+    },
+  },
+  getAuthorization(user.walletToken ?? user.accessToken),
+);
+
+// payload.response.success - is transaction was successful
+// payload.response.order - order info
 ```
 
 ### Order status
