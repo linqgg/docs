@@ -110,6 +110,9 @@ Not necessarily, but it is recommended to additionally request his permission fo
 
 #### User request validation
 
+
+##### With LinQ App
+
 The received token should be added to a deep link, which will open the LinQ Wallet application, where the user can log in to his account and confirm the request from the game. Thus, the game account will be linked to the wallet account. If the wallet application is not installed, the user should be sent to the App Store for installation.
 
 ```
@@ -131,6 +134,20 @@ Application.OpenURL(IOSCanOpenURL.CheckUrl(inappLink) ? inappLink : storeLink);
 ```
 
 There is also a method of transferring tokens through Keychain, which is used in cases where the wallet application is not yet installed on the user’s device. More information about this method on the page [keychain.md](/modules/autherntication/keychain.md "mention").
+
+##### With LinQ Web
+
+Redirect to web login page to verify received token. It can opened either through webview or in separate browser window.
+
+```
+https://s.stage.linq.gg/verify_token?token=${userToken} // Staging
+```
+
+```
+https://s.linq.gg/verify_token?token=${userToken} // Production
+```
+
+If use webview you can close it and proceed after page will be redirected to `/verify_success` path. All errors will redirect to `/error`.
 
 #### Authorization and obtaining an access token
 
