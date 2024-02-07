@@ -293,5 +293,5 @@ To check if any money operation limit reached use [IsLimitReached](https://buf.b
 
 #### Anonymous profiles
 
-Current total deposit amount for anonymous profiles is limited to **100.00**.
+Current total deposit amount for anonymous profiles is limited to **20.00**.
 To overcome it please [sign in user with LinQ wallet](/modules/auth#authorization-request) or [provide user's game account data](/modules/auth#save-game-user-data-to-anonymous-profile-to-avoid-deposit-limits)
