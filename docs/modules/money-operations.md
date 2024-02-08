@@ -82,11 +82,13 @@ const payload = await service.newReplenishOrder(
       merchant.games.galactica.linq
       merchant.games.galactica.linq-2
       ```
-2. Call [newReplenishOrder](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.PaymentsService.newReplenishOrder) to initiate order and get [apple_pay_config](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.OrderStatusResponse).
+2. Call [PaymentsService#newReplenishOrder](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.PaymentsService.newReplenishOrder) to initiate order.
+
+3. Call [NativePaymentsService#GetApplePayConfig](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.NativePaymentsService.GetApplePayConfig) (authenticated by [public secret key](/modules/auth/tokens#public) and can be called from mobile) to get [apple_pay_config](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.ApplePayConfig) for order.
 
 3. Build [PKPaymentRequest](https://developer.apple.com/documentation/passkit_apple_pay_and_wallet/pkpaymentrequest) using data from [apple_pay_config](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.ApplePayConfig). Proceed with Apple Pay and get [PKPayment](https://developer.apple.com/documentation/passkit_apple_pay_and_wallet/pkpayment) in response.
 
-4. Call [MakePayment](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.PaymentsService.MakePayment) with data got on the previous step.
+4. Call [NativePaymentsService#MakePayment](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.NativePaymentsService.MakePayment) (authenticated by [public secret key](/modules/auth/tokens#public) and can be called from mobile) with data got at the previous steps.
    - apple_pay_payment should contain [payment_data json string](https://developer.apple.com/documentation/passkit_apple_pay_and_wallet/pkpaymenttoken/1617000-paymentdata)
    - pass billing address data got from [billingContact postalAddress](https://developer.apple.com/documentation/passkit_apple_pay_and_wallet/pkpayment/1619320-billingcontact). Map [Apple CNPostalAddress](https://developer.apple.com/documentation/contacts/cnpostaladdress) to [Buf BillingAddress](https://buf.build/linq/linq/docs/main:linq.shared#linq.shared.BillingAddress)
       - isoCountryCode -> country
@@ -122,7 +124,7 @@ const payload = await service.makePayment(
       }),
     },
   },
-  getAuthorization(user.walletToken ?? user.accessToken),
+  getAuthorization(secretPublicKey),
 );
 
 // payload.response.success - is transaction was successful
@@ -133,8 +135,9 @@ const payload = await service.makePayment(
 
 1. Implement screens to collect card data (number, expiration date, cvv, holder name) and billing address (country, region/state, city, street address, zip/postal code)
 2. Integrate [Kount DDC](https://developer.kount.com/hc/en-us/sections/5319287642260-Integration-Guide?article=4411149718676) (to collect data for fraud prevention)
-3. Call [newReplenishOrder](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.PaymentsService.newReplenishOrder) to initiate order and get [tokenex_config and kount_config](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.OrderStatusResponse).
-4. Make request to [Tokenex Mobile Api](https://docs.tokenex.com/docs/tokenize-with-cvv) using data from [tokenex_config](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.TokenexConfig) and card number with cvv to get Tokenex token and tokenHmac
+3. Call [PaymentsService#newReplenishOrder](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.PaymentsService.newReplenishOrder) to initiate order.
+4. Call [NativePaymentsService#GetCardPaymentConfig](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.NativePaymentsService.GetCardPaymentConfig) (authenticated by [public secret key](/modules/auth/tokens#public) and can be called from mobile) to get [card_payment_config](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.CardPaymentConfig) for order.
+5. Make request to [Tokenex Mobile Api](https://docs.tokenex.com/docs/tokenize-with-cvv) using data from [tokenex_config](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.TokenexConfig) and card number with cvv to get Tokenex token and tokenHmac
 ```typescript
 const response = await httpClient.post(tokenexConfig.url, {
   tokenexid: tokenexConfig.tokenexId,
@@ -148,8 +151,8 @@ const response = await httpClient.post(tokenexConfig.url, {
 // response.Token
 // response.TokenHMAC
 ```
-5. Initiate [Kount DDC](https://developer.kount.com/hc/en-us/sections/5319287642260-Integration-Guide?article=4411149718676) with data from [kount_config](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.KountConfig), call `collect` and get kount `sessionId`.
-6. Call [MakePayment](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.PaymentsService.MakePayment) with [card](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.CardTokenexPayment), [address](https://buf.build/linq/linq/docs/5cdbcb323d77420d84adb6c08aab4d4c/linq.shared#linq.shared.BillingAddress) and [kount](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.KountData) data.
+6. Initiate [Kount DDC](https://developer.kount.com/hc/en-us/sections/5319287642260-Integration-Guide?article=4411149718676) with data from [kount_config](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.KountConfig), call `collect` and get kount `sessionId`.
+7. Call [NativePaymentsService#MakePayment](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.NativePaymentsService.MakePayment) (authenticated by [public secret key](/modules/auth/tokens#public) and can be called from mobile) with [card](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.CardTokenexPayment), [address](https://buf.build/linq/linq/docs/5cdbcb323d77420d84adb6c08aab4d4c/linq.shared#linq.shared.BillingAddress) and [kount](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.KountData) data.
 ```typescript
 const payload = await service.makePayment(
   {
@@ -184,7 +187,7 @@ const payload = await service.makePayment(
       },
     },
   },
-  getAuthorization(user.walletToken ?? user.accessToken),
+  getAuthorization(secretPublicKey),
 );
 
 // payload.response.success - is transaction was successful

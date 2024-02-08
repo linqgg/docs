@@ -32,11 +32,17 @@ getAuthorization(user.walletToken ?? user.accessToken);
 
 Auxiliary tokens are needed to ensure the technical implementation of the exchange of sensitive information between applications or services.
 
-### Secret Key
+### Secret Keys
 
-The secret key is issued before the integration begins and is used to verify requests coming from a third-party service. In response to a request with such a key, a user access token is returned, which can be used to sign the user's transactions.
+#### Private
+
+The private secret key is issued before the integration begins and is used to verify requests coming from a third-party service. In response to a request with such a key, a user access token is returned, which can be used to sign the user's transactions.
 
 It is recommended to pass it to the application as an environment variable, while ensuring that the code is not leaked. For example, use Google Secret Manager or similar services. The principle of operation is almost the same as that of any Secret Key.
+
+#### Public
+
+The public secret key is issued before the integration begins and is used to initialize LinQ SDKs(Unity) and in general verify requests coming from front-end.
 
 ### Secret Token
 
