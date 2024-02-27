@@ -81,8 +81,13 @@ const config: Config = {
         //   label: 'Games',
         // },
         {
-          href: 'https://buf.build/linq/linq', 
-          label: 'API SDK on Buf', 
+          href: 'https://github.com/linqgg/unity-sdk',
+          label: 'Unity SDK',
+          position: 'right'
+        },
+        {
+          href: 'https://buf.build/linq/linq',
+          label: 'Server SDK',
           position: 'right'
         },
         {

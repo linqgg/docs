@@ -9,7 +9,7 @@ The LinQ Wallet system provides for the creation of an account for the user with
 
 The API provides three services for interaction. The first concerns the management of the game account, the second is needed to replenish the balance and transfer funds to the wallet for subsequent withdrawal, the third allows you to obtain a list of all transactions on the user account, which can be convenient for reconciling calculations.
 
-## Account management
+## Account Management
 
 To manage the account, the [AccountsService](https://buf.build/linq/linq/docs/main:linq.money.accounts.v1#linq.money.accounts.v1.AccountsService) service is used. It allows you to receive the current state of the user’s account, as well as carry out operations that are needed during the game: take the amount to bet in the tournament and credit the winnings after the end of the tournament.
 
@@ -20,11 +20,22 @@ Within a wallet, a user can have several gaming accounts and a basic wallet acco
 ```typescript
 const accountsService = new AccountsServiceClient(getTransport());
 
-const gamingBalance = await accountsService.getActualBalance({ currency: "GSC" }, getAuthorization(authToken));
 const walletBalance = await accountsService.getActualBalance({ currency: "LNQ" }, getAuthorization(authToken));
+const gamingBalance = await accountsService.getActualBalance({ currency: "GSC" }, getAuthorization(authToken));
 
 // gamingBalance.response.balance;
 // walletBalance.response.balance;
+```
+
+To avoid latency it is possible to request all balances in one request, but than you have to filter response on your side to match balances and currency in code of the game.
+
+```typescript
+const accountsService = new AccountsServiceClient(getTransport());
+
+const accounts = await accountsService.getAllAccounts({}, getAuthorization(authToken));
+
+const walletBalance = accounts.response.accounts.filter((v) => v.currency == "LNQ").pop()?.balance || 0;
+const gamingBalance = accounts.response.accounts.filter((v) => v.currency == "GSC").pop()?.balance || 0;
 ```
 
 ### Withdrawal of funds
@@ -43,7 +54,7 @@ Similar to the process of withdrawing funds, funds are also credited to a specif
 // Some code
 ```
 
-## Payment transactions
+## Payment Transactions
 
 When working with payments, the API operates with the concept of Order. The order stores information in general about the user's intent and the order goes through processing stages where additional technical information is added to it. The order works similarly to orders in e-commerce, but taking into account the specifics of the game. The [PaymentsService](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.PaymentsService) service is responsible for the formation and processing of orders.
 
@@ -64,9 +75,11 @@ const payload = await service.newReplenishOrder(
 // payload.response.checkout - link to checkout page
 ```
 
-### Native replenishment
+### Native Payments
 
-#### Apple Pay
+We provide an ability to integrate native payments in the game using special [Unity SDK](https://github.com/linqgg/unity-sdk), which is handle all operations with user sensitive payment data (like card number, cvv and others) on the client side. Such an approach makes the process much easier and PCI DSS compliant at the same time.
+
+#### Native Apple Pay
 
 1. [Configure Apple Pay](https://developer.apple.com/documentation/passkit_apple_pay_and_wallet/apple_pay/setting_up_apple_pay)
    - [Apple developer account](https://developer.apple.com/account/resources/identifiers/list) - Enable Apple Pay Payment Processing for required bundle id, configure Merchant IDs
@@ -131,70 +144,54 @@ const payload = await service.makePayment(
 // payload.response.order - order info
 ```
 
-#### Card
+#### Native Payment Card
 
-1. Implement screens to collect card data (number, expiration date, cvv, holder name) and billing address (country, region/state, city, street address, zip/postal code)
-2. Integrate [Kount DDC](https://developer.kount.com/hc/en-us/sections/5319287642260-Integration-Guide?article=4411149718676) (to collect data for fraud prevention)
-3. Call [PaymentsService#newReplenishOrder](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.PaymentsService.newReplenishOrder) to initiate order.
-4. Call [NativePaymentsService#GetCardPaymentConfig](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.NativePaymentsService.GetCardPaymentConfig) (authenticated by [public secret key](/modules/auth/tokens#public) and can be called from mobile) to get [card_payment_config](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.CardPaymentConfig) for order.
-5. Make request to [Tokenex Mobile Api](https://docs.tokenex.com/docs/tokenize-with-cvv) using data from [tokenex_config](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.TokenexConfig) and card number with cvv to get Tokenex token and tokenHmac
-```typescript
-const response = await httpClient.post(tokenexConfig.url, {
-  tokenexid: tokenexConfig.tokenexId,
-  timestamp: tokenexConfig.timestamp,
-  authenticationKey: tokenexConfig.authenticationKey,
-  tokenScheme: tokenexConfig.tokenScheme,
-  data: '4242424242424242',
-  cvv: '123',
-});
+To implement native payments via debit or credit cards, you have to implement UI elements for capturing payment data, like **card number**, **protection code**, **cardholder name**, and **expiration date**, as well as elements for capturing player **billing address**. To be compliant with PCI standards, you have to avoid sending captured data to any of your backend services except providing payment details to the specified SDK methods.
 
-// response.Token
-// response.TokenHMAC
-```
-6. Initiate [Kount DDC](https://developer.kount.com/hc/en-us/sections/5319287642260-Integration-Guide?article=4411149718676) with data from [kount_config](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.KountConfig), call `collect` and get kount `sessionId`.
-7. Call [NativePaymentsService#MakePayment](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.NativePaymentsService.MakePayment) (authenticated by [public secret key](/modules/auth/tokens#public) and can be called from mobile) with [card](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.CardTokenexPayment), [address](https://buf.build/linq/linq/docs/5cdbcb323d77420d84adb6c08aab4d4c/linq.shared#linq.shared.BillingAddress) and [kount](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.KountData) data.
-```typescript
-const payload = await service.makePayment(
-  {
-    // newReplenishOrder OrderStatusResponse id
-    orderId: 'abcd-efgh'
-    // Billing address
-    address: {
-      country: 'US',
-      region: 'CA',
-      city: 'Cupertino',
-      street: 'One Apple Park Way',
-      zip: '95014',
-    },
-    cardTokenexPayment: {
-      // token from Tokenize Mobile Api response
-      token: '424242ABCDEF4242',
-      // tokenHmac from Tokenize Mobile Api response
-      tokenHmac: 'tokenHmac',
-      // card expiration year
-      expYear: '28',
-      // card expiration month
-      expMonth: '12',
-      // card holder name
-      cardHolderName: 'Galactica Games',
-      kountData: {
-        // sessionId from Kount DDC collect
-        sessionId: '1234',
-        // first 6 card digits,
-        firstSix: '424242',
-        // last 4 card digits,
-        lastFour: '4242',
-      },
-    },
-  },
-  getAuthorization(secretPublicKey),
-);
+We use certified third-party services for card tokenization in combination with anti-fraud checks, and we do not handle raw user payment information as well.
 
-// payload.response.success - is transaction was successful
-// payload.response.order - order info
+Before start integrating, you have to [install](https://github.com/linqgg/unity-sdk?tab=readme-ov-file#installation) and [configure](https://github.com/linqgg/unity-sdk?tab=readme-ov-file#setup) our Unity SDK.
+
+If you integrated LinQ wallet services before, the flow will remain almost the same. You have to generate a replenishment order by `putReplenishOrder` from Server SDK, and proceed with Unity SDK using the returned `order.id`.
+
+```scharp
+// Card Details
+var details = new PaymentDetails()
+{
+  CardNumber = "4242424242424242",
+  Expiration = "12/27",
+  HolderName = "Kevon Chang",
+  Protection = "123",
+};
+
+// Billing Address
+var address = new BillingAddress()
+{
+  Country = "US", // 2-letter code
+  Region = "Iowa",
+  City = "Iowa City",
+  Street = "109 S Johnson St",
+  Zip = "52240"
+};
+
+var order = await LinqSDK.StartPaymentProcessing(data.id, details, address);
+
+Debug.Log("Order status: " + order.Status);
 ```
 
-### Order status
+For testing purposes, you can use the following card credentials:
+
+- Number: `4242424242424242`
+- Expriration: `12/27`
+- Holder Name: `CARD HOLDER`
+- CVV Code: `123`
+
+In some cases, native modules, that are used under the hood, may not work. It is applied for situations when the game is running on Android or from Unity Editor. To not block the flow it is possible to skip anti-fraud checks by providing the word `NOFRAUD` in the field of the cardholder name.
+
+To get updated with the lates usage examples, please check relevant documentation section about [Unity SDK usage](https://github.com/linqgg/unity-sdk?tab=readme-ov-file#usage).
+
+
+### Order Status
 
 After creating a replenishment order, a link will be returned in response, which must be displayed inside the game using webview. After payment (successful or not), control will be returned back to the application, after which you should make sure what the status of the order is. It can be successfully paid or rejected by the payment system.
 
