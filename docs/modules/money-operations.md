@@ -79,71 +79,6 @@ const payload = await service.newReplenishOrder(
 
 We provide an ability to integrate native payments in the game using special [Unity SDK](https://github.com/linqgg/unity-sdk), which is handle all operations with user sensitive payment data (like card number, cvv and others) on the client side. Such an approach makes the process much easier and PCI DSS compliant at the same time.
 
-#### Native Apple Pay
-
-1. [Configure Apple Pay](https://developer.apple.com/documentation/passkit_apple_pay_and_wallet/apple_pay/setting_up_apple_pay)
-   - [Apple developer account](https://developer.apple.com/account/resources/identifiers/list) - Enable Apple Pay Payment Processing for required bundle id, configure Merchant IDs
-   - Xcode - add Apple Pay to Signing & Capabilities, enable Merchant IDs
-   - Possible Merchant IDs
-      - Staging
-      ```
-      merchant.games.galactica.linq-test
-      merchant.games.galactica.linq-2-test
-      ```
-      - Production
-      ```
-      merchant.games.galactica.linq
-      merchant.games.galactica.linq-2
-      ```
-2. Call [PaymentsService#newReplenishOrder](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.PaymentsService.newReplenishOrder) to initiate order.
-
-3. Call [NativePaymentsService#GetApplePayConfig](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.NativePaymentsService.GetApplePayConfig) (authenticated by [public secret key](/modules/auth/tokens#public) and can be called from mobile) to get [apple_pay_config](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.ApplePayConfig) for order.
-
-3. Build [PKPaymentRequest](https://developer.apple.com/documentation/passkit_apple_pay_and_wallet/pkpaymentrequest) using data from [apple_pay_config](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.ApplePayConfig). Proceed with Apple Pay and get [PKPayment](https://developer.apple.com/documentation/passkit_apple_pay_and_wallet/pkpayment) in response.
-
-4. Call [NativePaymentsService#MakePayment](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.NativePaymentsService.MakePayment) (authenticated by [public secret key](/modules/auth/tokens#public) and can be called from mobile) with data got at the previous steps.
-   - apple_pay_payment should contain [payment_data json string](https://developer.apple.com/documentation/passkit_apple_pay_and_wallet/pkpaymenttoken/1617000-paymentdata)
-   - pass billing address data got from [billingContact postalAddress](https://developer.apple.com/documentation/passkit_apple_pay_and_wallet/pkpayment/1619320-billingcontact). Map [Apple CNPostalAddress](https://developer.apple.com/documentation/contacts/cnpostaladdress) to [Buf BillingAddress](https://buf.build/linq/linq/docs/main:linq.shared#linq.shared.BillingAddress)
-      - isoCountryCode -> country
-      - state -> region
-      - city -> city
-      - street -> street
-      - postalCode -> zip
-
-```typescript
-const payload = await service.makePayment(
-  {
-    // newReplenishOrder OrderStatusResponse id
-    orderId: 'abcd-efgh'
-    // PKPayment billingContact postalAddress
-    address: {
-      country: 'US',
-      region: 'CA',
-      city: 'Cupertino',
-      street: 'One Apple Park Way',
-      zip: '95014',
-    },
-    applePayPayment: {
-      // PKPayment token paymentData
-      paymentData: JSON.stringify({
-        version: 'EC_v1',
-        data: 'abcd...',
-        signature: 'abcd...',
-        header: {
-          transactionId: 'abcd...',
-          ephemeralPublicKey: 'abcd...',
-          publicKeyHash: 'abcd...',
-        },
-      }),
-    },
-  },
-  getAuthorization(secretPublicKey),
-);
-
-// payload.response.success - is transaction was successful
-// payload.response.order - order info
-```
-
 #### Native Payment Card
 
 To implement native payments via debit or credit cards, you have to implement UI elements for capturing payment data, like **card number**, **protection code**, **cardholder name**, and **expiration date**, as well as elements for capturing player **billing address**. To be compliant with PCI standards, you have to avoid sending captured data to any of your backend services except providing payment details to the specified SDK methods.
@@ -174,19 +109,45 @@ var address = new BillingAddress()
   Zip = "52240"
 };
 
-var order = await LinqSDK.StartPaymentProcessing(data.id, details, address);
-
-Debug.Log("Order status: " + order.Status);
+try {
+  var response = await LinqSDK.CheckoutByOrdinaryCard(order, details, address);
+  Debug.Log("Order status: " + response.Status);
+} catch (InvalidOperationException e) {
+  Debug.Log("Failure: " + e.Message);
+}
 ```
 
 For testing purposes, you can use the following card credentials:
 
-- Number: `4242424242424242`
+- Number: `4242 4242 4242 4242`
 - Expriration: `12/27`
 - Holder Name: `CARD HOLDER`
 - CVV Code: `123`
 
 In some cases, native modules, that are used under the hood, may not work. It is applied for situations when the game is running on Android or from Unity Editor. To not block the flow it is possible to skip anti-fraud checks by providing the word `NOFRAUD` in the field of the cardholder name.
+
+#### Native Apple Pay
+
+Apple Pay method does not require a billing address or card details, as it comes from the user's wallet. Additionally, need to handle some exceptions in case payment fails or is canceled by the user to avoid the application hanging out.
+
+```scharp
+try {
+  var response = await LinqSDK.CheckoutByApplePayCard(order);
+  Debug.Log("Order status: " + response.Status);
+} catch (PaymentUnknownException e) {
+  Debug.Log("Unknown: " + e.Message); // do nothing
+} catch (PaymentFailureException e) {
+  Debug.Log("Failure: " + e.Message); // show a message about failed payment
+} catch (PaymentDiscardException e) {
+  Debug.Log("Discard: " + e.Message); // handle logic about cancellation
+}
+```
+
+For **Apple Pay** testing, you need to create special testing account and add there the next card details. Authorization may work with any cards and accounts, but transactions will fail on the provider side.
+
+- Number: `5204 2452 5000 1488`
+- Expriration: `11/2022`
+- CVV Code: `111`
 
 To get updated with the lates usage examples, please check relevant documentation section about [Unity SDK usage](https://github.com/linqgg/unity-sdk?tab=readme-ov-file#usage).
 
