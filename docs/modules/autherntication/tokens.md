@@ -18,7 +18,7 @@ This token is created upon request from a third-party service and is then used t
 
 ### Wallet Token
 
-This token is issued after authorization through the LinQ Wallet application. Works similar to _Access Token_, but provides more rights. The token's lifetime is also unlimited. The token must be stored in the user profile.
+This token is issued after authorization through the LinQ application. Works similar to _Access Token_, but provides more rights. The token's lifetime is also unlimited. The token must be stored in the user profile.
 
 After authorization, _Access Token_ can be replaced with _Wallet Token_, or you can store both, but use _Wallet Token_ first when authorizing.
 
@@ -46,4 +46,4 @@ The public secret key is issued before the integration begins and is used to ini
 
 ### Secret Token
 
-This token is required to initiate login through LinQ Wallet from the application or game side. This token is involved in the formation of a special secret code, which is verified in the LinQ Wallet application, and based on this code, the accounts are finally linked.
+This token is required to initiate login through LinQ app from the application or game side. This token is involved in the formation of a special secret code, which is verified in the LinQ application, and based on this code, the accounts are finally linked.

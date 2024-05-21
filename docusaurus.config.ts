@@ -3,7 +3,7 @@ import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
-  title: 'LinQ Wallet Documentation',
+  title: 'LinQ Documentation',
   favicon: 'img/favicon.ico',
 
   url: 'https://docs.linq.gg',
@@ -49,9 +49,9 @@ const config: Config = {
     // Replace with your project's social card  todo:
     // image: 'img/docusaurus-social-card.jpg',
     navbar: {
-      title: 'LinQ Wallet Docs',
+      title: 'LinQ Docs',
       logo: {
-        alt: 'LinQ Wallet Logo',
+        alt: 'LinQ Logo',
         src: 'img/logo.png',
       },
       items: [
@@ -92,7 +92,7 @@ const config: Config = {
         },
         {
           href: 'https://linq.gg/',
-          label: 'Wallet App',
+          label: 'LinQ Pay',
           position: 'right'
         },
         {
@@ -144,15 +144,15 @@ const config: Config = {
           ],
         },
         {
-          title: 'LinQ Wallet App',
+          title: 'Resources',
           items: [
             {
-              label: 'Website',
+              label: 'LinQ Pay',
               href: 'https://linq.gg/',
             },
             {
-              label: 'Apple Store',
-              href: 'https://apps.apple.com/us/app/linq-wallet/id6447305486',
+              label: 'App Store',
+              href: 'https://apps.apple.com/us/developer/galactica-games/id1680876974',
             },
           ],
         },
@@ -161,11 +161,11 @@ const config: Config = {
           items: [
             {
               label: 'Privacy Policy',
-              href: 'http://linq.gg/privacy',
+              href: 'https://linq.gg/privacy-policy',
             },
             {
               label: 'Terms & Conditions',
-              href: 'http://linq.gg/terms',
+              href: 'https://linq.gg/terms-of-use',
             },
             {
               label: 'Contact',
