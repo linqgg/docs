@@ -1,18 +1,18 @@
 ---
 sidebar_position: 1
-description: General description of interactions with LinQ Wallet services
+description: General description of interactions with LinQ services
 slug: /
 ---
 
 # Introduction
 
-This documentation describes the integration process with LinQ Wallet services, as well as the login mechanism through the LinQ Wallet application. Logging in through the wallet app allows users to authenticate and gives access to all cash flow related features. This is necessary to improve usability and security. However, basic functions are available without authorization through the application.
+This documentation describes the integration process with LinQ services, as well as the login mechanism through the special LinQ application. Logging in through the LinQ app allows users to authenticate and gives access to all cash flow related features. This is necessary to improve usability and security. However, basic functions are available without authorization through the application.
 
 ## Features
 
 Integration through the application includes the following modules:
 
-* [Authentication](modules/auth "Registration and authorization in wallet services")
+* [Authentication](modules/auth "Registration and authorization in services")
 * [Location Checks](modules/location-checks.md "Check the location by IP address and more precise way using coordinates")
 * [Money Operations](modules/money-operations.md "All cash related operations, including transfers and custom rewards")
 <!-- Playing Sessions(modules/playing-sessions.md "Playing related actions, like tournaments starting and players joining")  */} -->
@@ -21,11 +21,11 @@ For integration, the gRPC procedure call protocol is used together with Protocol
 
 To connect to services, you must use generated client libraries, which are issued according to agreements.
 
-Technical details of connecting to LinQ Wallet services are described on the page [Getting Started](./getting-started.mdx)
+Technical details of connecting to LinQ services are described on the page [Getting Started](./getting-started.mdx)
 
 ### Ways of use
 
-In both cases of using the API, the user in the LinQ Wallet system creates his own payment account, and an internal account is created for it in the internal currency associated with the game. Deposit and transfer transactions operate on the balances in these internal accounts.
+In both cases of using the API, the user in the LinQ system creates his own payment account, and an internal account is created for it in the internal currency associated with the game. Deposit and transfer transactions operate on the balances in these internal accounts.
 
 #### Anonymous (conditional)
 
@@ -33,7 +33,7 @@ In the case of an anonymous account, an account is created in the same way as fo
 
 #### Authorized
 
-After the user is authorized through the application, all operations occur on behalf of the user account registered in LinQ Wallet. This allows you to have full access to all the features provided by LinQ services. In particular, go through KYC, withdraw the money you win to your wallet and then to a bank account or card, or use it in other games.
+After the user is authorized through the application, all operations occur on behalf of the user account registered in LinQ services. This allows you to have full access to all the features provided by LinQ services. In particular, go through KYC, withdraw the money you win to your wallet and then to a bank account or card, or use it in other games.
 
 ### Check location
 

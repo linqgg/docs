@@ -5,7 +5,7 @@ description: Description of methods for working with user accounts and transacti
 
 # Money Operations
 
-The LinQ Wallet system provides for the creation of an account for the user with the desired currency code, where funds are credited during the process of replenishment, transfer, or winning in a tournament.
+The LinQ system provides for the creation of an account for the user with the desired currency code, where funds are credited during the process of replenishment, transfer, or winning in a tournament.
 
 The API provides three services for interaction. The first concerns the management of the game account, the second is needed to replenish the balance and transfer funds to the wallet for subsequent withdrawal, the third allows you to obtain a list of all transactions on the user account, which can be convenient for reconciling calculations.
 
@@ -87,7 +87,7 @@ We use certified third-party services for card tokenization in combination with 
 
 Before start integrating, you have to [install](https://github.com/linqgg/unity-sdk?tab=readme-ov-file#installation) and [configure](https://github.com/linqgg/unity-sdk?tab=readme-ov-file#setup) our Unity SDK.
 
-If you integrated LinQ wallet services before, the flow will remain almost the same. You have to generate a replenishment order by `putReplenishOrder` from Server SDK, and proceed with Unity SDK using the returned `order.id`.
+If you integrated LinQ services before, the flow will remain almost the same. You have to generate a replenishment order by `putReplenishOrder` from Server SDK, and proceed with Unity SDK using the returned `order.id`.
 
 ```scharp
 // Card Details
