@@ -179,6 +179,7 @@ const config: Config = {
     prism: {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
+      additionalLanguages: ['protobuf'],
     },
     mermaid: {
       theme: { light: 'neutral', dark: 'forest' },

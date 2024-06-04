@@ -1,6 +1,8 @@
 ---
-sidebar_position: 2
+id: operations
+sidebar_position: 1
 description: Description of methods for working with user accounts and transactions on these accounts
+slug: /modules/money
 ---
 
 # Money Operations
