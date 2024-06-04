@@ -1,6 +1,7 @@
 ---
 sidebar_position: 3
 description: Description of methods for working with tournaments and its players
+slug: /modules/play
 ---
 
 # Play Mechanics 🏷️
@@ -47,7 +48,7 @@ To use the tournament management API, follow these steps:
 
 ### Example Workflow
 
-**Initiate a Session**:
+#### Initiate a Session
 
   ```typescript
     const remoteSession = await sessionService.initiate({ 
@@ -61,7 +62,7 @@ To use the tournament management API, follow these steps:
     tournament.remote = remoteSession.id;
   ```
 
-**Join a Player**:
+#### Join a Player
   
   ```typescript
     const remotePlayer = await playerService.join({
@@ -77,7 +78,7 @@ To use the tournament management API, follow these steps:
     player.remote = remotePlayer.id;
   ```
 
-**Complete the Session**:
+#### Complete the Session
   
   ```typescript
     //...
@@ -96,7 +97,7 @@ To use the tournament management API, follow these steps:
     }, getAuthorization(process.env.SECRET_KEY));
   ```
 
-**Player Gains Reward**:
+#### Player Gains Reward
 
   Normally one user as a player can take part only in one tournament. If it will change in the future, it is possible to use optional parameter `player` to define for which exact player under the current user to gain reward.
 
@@ -150,11 +151,11 @@ message GainPlayerRequest {
 
 ### Referencing Orders
 
-In other parts of public API we use special field `reference` to have an ability mark orders by custom user-defined keys, which later can be validated on the list of orders (history of transactions). Play API supports it as well, providing ability to define such property.
+In various parts of the public API, the reference field is utilized to tag orders with custom user-defined keys. This functionality enables users to mark and track transactions, which can later be validated against the order history (transaction list). The Play API also supports this feature, allowing you to define the `reference` property for better tracking and validation of all money orders associated with tournament sessions. This ensures that every financial transaction, from bets to rewards, is accurately recorded and easily traceable.
 
 ### Idempotency Implementation
 
-In this Play API we do not use special idempotency property, but still follow the idempotency approach. In case, when somebody try to join to the same session and it already was done before, we will return the same remote id and attached order. Same works for gaining rewards.
+While the Play API does not use a specific idempotency property, it still adheres to idempotency principles. If a player attempts to join the same session multiple times, the API will return the same remote ID and associated order as the initial request. This approach ensures that duplicate requests do not result in multiple entries or duplicate transactions. The same idempotent behavior applies when players claim their rewards; repeated requests will yield the same result as the first successful attempt. This ensures consistency and reliability in the management of tournament sessions and rewards.
 
 ### Error Handling
 

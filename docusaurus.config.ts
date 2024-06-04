@@ -109,16 +109,16 @@ const config: Config = {
           title: 'Documentation',
           items: [
             {
-              label: 'Authentication',
+              label: 'Auth Actions',
               to: '/modules/auth',
             },
-            // {
-            //   label: 'Playing Sessions',
-            //   to: '/modules/authentication',
-            // },
             {
               label: 'Money Operations',
               to: '/modules/money',
+            },
+            {
+              label: 'Play Mechanics',
+              to: '/modules/play',
             },
             {
               label: 'Location Checks',
