@@ -168,7 +168,7 @@ const payload = await service.signInGameUser(data, getAuthorization(authToken));
 
 ## Save game user data to anonymous profile to avoid deposit limits
 
-To avoid [deposit limits](/modules/money-operations#anonymous-profiles) you need to provide user's game account info using [SaveGameUser](https://buf.build/linq/linq/docs/main:linq.auth.user.v1#linq.auth.user.v1.AuthUserService.SaveGameUser)
+To avoid [deposit limits](/modules/money#anonymous-profiles) you need to provide user's game account info using [SaveGameUser](https://buf.build/linq/linq/docs/main:linq.auth.user.v1#linq.auth.user.v1.AuthUserService.SaveGameUser)
 
 ```typescript
 const service = new AuthUserServiceClient(getTransport());

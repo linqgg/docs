@@ -14,7 +14,7 @@ Integration through the application includes the following modules:
 
 * [Authentication](modules/auth "Registration and authorization in services")
 * [Location Checks](modules/location-checks.md "Check the location by IP address and more precise way using coordinates")
-* [Money Operations](modules/money-operations.md "All cash related operations, including transfers and custom rewards")
+* [Money Operations](modules/money "All cash related operations, including transfers and custom rewards")
 * [Play Mechanics](modules/play-mechanics.md "Playing related actions, like tournaments starting and players joining")
 
 For integration, the gRPC procedure call protocol is used together with Protocol Buffers.

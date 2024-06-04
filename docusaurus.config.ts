@@ -71,7 +71,7 @@ const config: Config = {
           label: 'Locations',
         },
         {
-          to: '/modules/money-operations',
+          to: '/modules/money',
           position: 'left',
           label: 'Money',
         },
@@ -118,7 +118,7 @@ const config: Config = {
             // },
             {
               label: 'Money Operations',
-              to: '/modules/money-operations',
+              to: '/modules/money',
             },
             {
               label: 'Location Checks',
