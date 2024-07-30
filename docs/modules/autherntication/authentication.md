@@ -133,6 +133,13 @@ var inappLink = string.Format(linqUrl, response.token);
 Application.OpenURL(IOSCanOpenURL.CheckUrl(inappLink) ? inappLink : storeLink);
 ```
 
+Or you can use Associated domain that opens app if installed and redirects to App store (or Testflight for staging) if not installed
+
+```
+https://a.stg.linq.gg?user_token={token} // stage
+https://a.linq.gg?user_token={token} // prod
+```
+
 There is also a method of transferring tokens through Keychain, which is used in cases where the LinQ application is not yet installed on the user’s device. More information about this method on the page [keychain.md](/modules/autherntication/keychain.md "mention").
 
 ##### With LinQ Web

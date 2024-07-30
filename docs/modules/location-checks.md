@@ -17,7 +17,7 @@ Checking the location using the user's coordinates is carried out to ensure the 
 
 To check access over IP, the `RestrictionsService` service is used, which provides the `isAccessAllowed` method
 
-### List of countries and regions where transactions are restricted
+<!-- ### List of countries and regions where transactions are restricted
 
 In some cases, you may need to check access from a certain region through third-party services, in which case you can use the [ConfigurationService](https://buf.build/linq/linq/docs/main:linq.geo.restrictions.v1#linq.service.geo.restrictions.v1.ConfigurationService) to obtain an up-to-date list of countries and regions where restrictions on operations have been introduced.
 
@@ -40,7 +40,7 @@ const payload = await service.getAvoidedRegions({
   ]
 }
 **/
-```
+``` -->
 
 ## Check by GEO
 

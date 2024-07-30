@@ -10,7 +10,7 @@ During the integration process, you need to link the game and the LinQ applicati
 
 For such cases, you should use saving the access token in a special storage [Keychain](https://developer.apple.com/documentation/security/keychain\_services). Then, after redirecting the player to the Apple Store and installing the LinQ application, the LinQ application will be able to obtain this token from the storage and make a request to authorize the game.
 
-After verifying the token and confirming their intention to link accounts, the user will be redirected back to the game, where they will need to complete [user login request](https://galactica-games.gitbook.io/integration-sdk/sections/registraciya-i- avtorizaciya#avtorizaciya-i-poluchenie-tokena-dostupa) with a previously received token.
+After verifying the token and confirming their intention to link accounts, the user will be redirected back to the game, where they will need to complete [user login request](/modules/auth#authorization-and-obtaining-an-access-token) with a previously received token.
 
 ## Limitations when working with Keychain
 
@@ -22,13 +22,24 @@ There is no such solution for the Android version yet, but it may be available i
 
 To work with Keychain in Unity, you can use the plugin [iOS Keychain Plugin](https://assetstore.unity.com/packages/3d/characters/ios-keychain-plugin-43083), but not necessarily, there may be better solutions.
 
-In the Solitaire Coin game, the moment you click on the "Sign In with LinQ" button before redirecting the user to LinQ (if installed) or to the AppStore (if not installed), the `user_token` received from the API is stored in the storage.
+<!-- In the Solitaire Coin game, the moment you click on the "Sign In with LinQ" button before redirecting the user to LinQ (if installed) or to the AppStore (if not installed), the `user_token` received from the API is stored in the storage. -->
+
+You need to set iOS Keychain [`accessGroup`](https://developer.apple.com/documentation/security/ksecattraccessgroup) and configure [Keychain Sharing capability](https://developer.apple.com/documentation/xcode/configuring-keychain-sharing) to [save the token to keychain](https://developer.apple.com/documentation/security/keychain_services/keychain_items/sharing_access_to_keychain_items_among_a_collection_of_apps) in the right way.
+
+Access groups:
+```
+$(teamID).games.galactica.linq.stg.shared // stg
+$(teamID).games.galactica.linq.shared // prod
+```
+
+(Pay attention that all access groups configurations should be set up without $(teamID) prefix, it's added automatically when the app published from Galactica Games account)
+
 
 ```csharp
 API.GetLinqUserToken(response =>
 {
   #if UNITY_IOS
-    Keychain.SetValue("walletUserToken", response.token);
+    Keychain.SetValue("GAME_LOGIN_TO_GALACTICA_WALLET_TOKEN", response.token);
   #endif
 }, error =>
 {
@@ -38,7 +49,7 @@ API.GetLinqUserToken(response =>
 
 Next, you should implement processing of the situation when the user returns to the game and make a request to confirm the account link.
 
-## LinQ app token verification
+<!-- ## LinQ app token verification
 
 This type of integration is _**not required**_, but it is possible. The LinQ application has the ability to check which of the registered games are installed on the user's phone and when entering the LinQ application, it offers to authorize this game, similar to the situation when the user was redirected from the game to the wallet.&#x20;
 
@@ -52,4 +63,4 @@ In this case, the LinQ application, for its part, generates `user_token` and, wh
   API.AuthSignIn(token, OnSingInSuccess, OnSingInError);
 
 #endif
-```
+``` -->
