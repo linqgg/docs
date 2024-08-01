@@ -89,7 +89,7 @@ We use certified third-party services for card tokenization in combination with 
 
 Before start integrating, you have to [install](https://github.com/linqgg/unity-sdk?tab=readme-ov-file#installation) and [configure](https://github.com/linqgg/unity-sdk?tab=readme-ov-file#setup) our Unity SDK.
 
-If you integrated LinQ services before, the flow will remain almost the same. You have to generate a replenishment order by `putReplenishOrder` from Server SDK, and proceed with Unity SDK using the returned `order.id`.
+If you integrated LinQ services before, the flow will remain almost the same. You have to generate a replenishment order by `newReplenishOrder` from Server SDK, and proceed with Unity SDK using the returned `order.id`.
 
 ```scharp
 // Card Details
@@ -152,6 +152,17 @@ For **Apple Pay** testing, you need to create special testing account and add th
 - CVV Code: `111`
 
 To get updated with the lates usage examples, please check relevant documentation section about [Unity SDK usage](https://github.com/linqgg/unity-sdk?tab=readme-ov-file#usage).
+
+### Brazil Pix payment
+To make the payment Pix code should be generated and displayed to the user.
+
+To generate Pix code user's full name and email are required. They should be passed to us with help of [AuthUserService#SaveGameUser](https://buf.build/linq/linq/docs/main:linq.auth.user.v1#linq.auth.user.v1.AuthUserService.SaveGameUser) method. If the data won't be passed [NativePaymentsService#GetPixPaymentData](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.NativePaymentsService.GetPixPaymentData) request will be failed.
+
+First order should be initialized with `newReplenishOrder` called from the server.
+
+Then call [NativePaymentsService#GetPixPaymentData](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.NativePaymentsService.GetPixPaymentData) (authenticated by [Public token](/modules/auth/tokens#public)). It accepts optional [params](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.PixPaymentRequest) tax_id and address. Tax id is Brazilian CPF number (ask if validation rules are required). Address - country is 2-letter code of Brazil (BR), region is 2-letter code of Brazilian state (ask if list of states with their full names are required).
+
+After displaying Pix code to user wait for the some time and use [getOrderStatus](/modules/money#order-status) to determine if order status changed and if it succeed or not.
 
 
 ### Order Status
