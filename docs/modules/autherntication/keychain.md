@@ -20,31 +20,17 @@ There is no such solution for the Android version yet, but it may be available i
 
 ## Implementation example
 
-To work with Keychain in Unity, you can use the plugin [iOS Keychain Plugin](https://assetstore.unity.com/packages/3d/characters/ios-keychain-plugin-43083), but not necessarily, there may be better solutions.
+Keychain access groups:
 
-<!-- In the Solitaire Coin game, the moment you click on the "Sign In with LinQ" button before redirecting the user to LinQ (if installed) or to the AppStore (if not installed), the `user_token` received from the API is stored in the storage. -->
-
-You need to set iOS Keychain [`accessGroup`](https://developer.apple.com/documentation/security/ksecattraccessgroup) and configure [Keychain Sharing capability](https://developer.apple.com/documentation/xcode/configuring-keychain-sharing) to [save the token to keychain](https://developer.apple.com/documentation/security/keychain_services/keychain_items/sharing_access_to_keychain_items_among_a_collection_of_apps) in the right way.
-
-Access groups:
 ```
-$(teamID).games.galactica.linq.stg.shared // stg
-$(teamID).games.galactica.linq.shared // prod
+$(AppIdentifierPrefix)games.galactica.linq.stg.shared // staging
+$(AppIdentifierPrefix)games.galactica.linq.shared // production
 ```
 
-(Pay attention that all access groups configurations should be set up without $(teamID) prefix, it's added automatically when the app published from Galactica Games account)
-
+First configure keychain access groups, it's done by LinqSDK postbuild script, but asure everything is set up without issues. Access groups should appear in ios project `*.entitlements` file under `keychain-access-groups` key. (Xcode -> Signing & Capabilities -> Keychain Sharing)
 
 ```csharp
-API.GetLinqUserToken(response =>
-{
-  #if UNITY_IOS
-    Keychain.SetValue("GAME_LOGIN_TO_GALACTICA_WALLET_TOKEN", response.token);
-  #endif
-}, error =>
-{
-  // handle error
-}
+LinqUnity.Keychain.setAuthUserToken(token, "PD4C59QQ2H.games.galactica.linq.stg.shared" // or PD4C59QQ2H.games.galactica.linq.shared for production);
 ```
 
 Next, you should implement processing of the situation when the user returns to the game and make a request to confirm the account link.
