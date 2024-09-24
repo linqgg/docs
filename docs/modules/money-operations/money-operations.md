@@ -158,9 +158,37 @@ To make the payment Pix code should be generated and displayed to the user.
 
 To generate Pix code user's full name and email are required. They should be passed to us with help of [AuthUserService#SaveGameUser](https://buf.build/linq/linq/docs/main:linq.auth.user.v1#linq.auth.user.v1.AuthUserService.SaveGameUser) method. If the data won't be passed [NativePaymentsService#GetPixPaymentData](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.NativePaymentsService.GetPixPaymentData) request will be failed.
 
-First order should be initialized with `newReplenishOrder` called from the server.
+To create Pix order call [PaymentsService#CreatePixOrder](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.PaymentsService.CreatePixOrder). It accepts optional [params](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.PixRequest) - tax_id and address. Tax id is Brazilian CPF number (ask if validation rules are required). Address - country is 2-letter code of Brazil (BR), region is 2-letter code of Brazilian state (ask if list of states with their full names are required).
 
-Then call [NativePaymentsService#GetPixPaymentData](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.NativePaymentsService.GetPixPaymentData) (authenticated by [Public token](/modules/auth/tokens#public)). It accepts optional [params](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.PixPaymentRequest) tax_id and address. Tax id is Brazilian CPF number (ask if validation rules are required). Address - country is 2-letter code of Brazil (BR), region is 2-letter code of Brazilian state (ask if list of states with their full names are required).
+```typescript
+const service = new PaymentsServiceClient(getTransport());
+
+const result = await service.createPixOrder(
+  {
+    order: {
+      amount: 500,
+      reference: '1234',
+    },
+    // optional
+    pixParams: {
+      taxId: '12312312387',
+      address: {
+        country: 'BR',
+        region: 'RJ',
+        city: 'Rio de Janeiro',
+        street: 'Street 1',
+        zip: '123456',
+      },
+    },
+  },
+  getAuthorization(user.walletToken ?? user.accessToken),
+);
+
+result.order.id;
+result.order.status;
+result.pixParams.code;
+
+```
 
 After displaying Pix code to user wait for the some time and use [getOrderStatus](/modules/money#order-status) to determine if order status changed and if it succeed or not.
 
