@@ -66,14 +66,14 @@ const config: Config = {
           label: 'Auth & Login',
         },
         {
-          to: '/modules/location-checks',
-          position: 'left',
-          label: 'Locations',
-        },
-        {
           to: '/modules/money',
           position: 'left',
           label: 'Money',
+        },
+        {
+          to: '/modules/location-checks',
+          position: 'left',
+          label: 'Locations',
         },
         // {
         //   to: 'modules/authentication',
@@ -116,10 +116,10 @@ const config: Config = {
               label: 'Money Operations',
               to: '/modules/money',
             },
-            {
-              label: 'Play Mechanics',
-              to: '/modules/play',
-            },
+            // {
+            //   label: 'Play Mechanics',
+            //   to: '/modules/play',
+            // },
             {
               label: 'Location Checks',
               to: '/modules/location-checks',
@@ -139,7 +139,7 @@ const config: Config = {
             },
             {
               label: 'GitHub',
-              href: 'https://github.com/linkgg/docs',
+              href: 'https://github.com/linqgg/docs',
             },
           ],
         },
@@ -152,7 +152,7 @@ const config: Config = {
             },
             {
               label: 'App Store',
-              href: 'https://apps.apple.com/us/developer/galactica-games/id1680876974',
+              href: 'https://apps.apple.com/us/app/linq-wallet/id6447305486',
             },
           ],
         },

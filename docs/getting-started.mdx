@@ -82,25 +82,22 @@ Please note that this example uses the `SERVICES_API_URL` environment variable. 
 
 As a test initial request, you can use a request to the location service by IP address. It does not require authorization.
 
-To begin with, you should download the generated client for this service, unpack it and copy it to the `src/services` folder.
-
-// link to file that can be downloaded
-Client for location service
+To begin with, you should install or download the [generated client](https://buf.build/linq/linq/sdks) for this service.
 
 Below is an example of using a client to call the necessary methods on the service, in this case to obtain information about the current location and a flag that indicates whether access is allowed or not.
 
 ```typescript
 // Import response type
-import { Access } from "./services/system/v1alpha1/restrictions";
+import { Access } from "@buf/linq_linq.grpc_web/linq/geo/restrictions/v2/restrictions";
 // Import service client for connecting to the backend
-import { RestrictionsServiceClient } from "./services/system/v1alpha1/restrictions.client";
+import { RestrictionsServiceClient } from "@buf/linq_linq.grpc_web/linq/geo/restrictions/v2/restrictions.client";
 // Import special helpers for building transport and auth
 import { getAuthorization, getTransport } from "./utils/transport";
 
 export const accessChecker = async (): Promise<Access> => {
   // creates service instance using transport as a parameter
   const service = new RestrictionsServiceClient(getTransport());
-  
+
   const access = await service.isAccessAllowed({});
   // in case authorization needed, use the next way of doing request
   // auth token - token, which backend gives for user oprations
@@ -116,8 +113,8 @@ accessChecker().then((access: Access) => {
 });
 ```
 
-
+{/*
 An example application for checking a location is attached below as an archive.
 
-link to file 
-src=".gitbook/assets/integration-sdk-example.zip"
+link to file
+src=".gitbook/assets/integration-sdk-example.zip" */}

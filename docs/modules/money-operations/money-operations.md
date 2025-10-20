@@ -40,7 +40,40 @@ const walletBalance = accounts.response.accounts.filter((v) => v.currency == "LN
 const gamingBalance = accounts.response.accounts.filter((v) => v.currency == "GSC").pop()?.balance || 0;
 ```
 
-### Withdrawal of funds
+### Deposit user game account
+
+To add money to user game account use [AccountsService#PutMoney](https://buf.build/linq/linq/docs/main:linq.money.accounts.v1#linq.money.accounts.v1.AccountsService.PutMoney) method
+
+```typescript
+const accountsService = new AccountsServiceClient(getTransport());
+
+await accountsService.putMoney({
+  idempotencyKey: 'ik-123',
+  amount: 500,
+  reason: 'Tournament reward',
+  extra: { tournament_id: 't1' },
+}, getAuthorization(authToken));
+
+```
+
+### Withdraw user game account
+
+To withdraw money from user game account use [AccountsService#GetMoney](https://buf.build/linq/linq/docs/main:linq.money.accounts.v1#linq.money.accounts.v1.AccountsService.GetMoney) method
+
+```typescript
+const accountsService = new AccountsServiceClient(getTransport());
+
+await accountsService.getMoney({
+  idempotencyKey: 'ik-124',
+  amount: 500,
+  reason: 'Tournament entry fee',
+  extra: { tournament_id: 't1' },
+}, getAuthorization(authToken));
+
+```
+
+
+<!-- ### Withdrawal of funds
 
 Withdrawal of funds from the account is carried out using a separate method, but in fact this operation generates an order, which is subsequently available in the transaction history.
 
@@ -54,7 +87,7 @@ Similar to the process of withdrawing funds, funds are also credited to a specif
 
 ```
 // Some code
-```
+``` -->
 
 ## Payment Transactions
 
@@ -156,7 +189,7 @@ To get updated with the lates usage examples, please check relevant documentatio
 ### Brazil Pix payment
 To make the payment Pix code should be generated and displayed to the user.
 
-To generate Pix code user's full name and email are required. They should be passed to us with help of [AuthUserService#SaveGameUser](https://buf.build/linq/linq/docs/main:linq.auth.user.v1#linq.auth.user.v1.AuthUserService.SaveGameUser) method. If the data won't be passed [NativePaymentsService#GetPixPaymentData](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.NativePaymentsService.GetPixPaymentData) request will be failed.
+For anonymous users to generate Pix code user's full name and email are required. They should be passed to us with help of [AuthUserService#SaveGameUser](https://buf.build/linq/linq/docs/main:linq.auth.user.v1#linq.auth.user.v1.AuthUserService.SaveGameUser) method if not passed previously.
 
 To create Pix order call [PaymentsService#CreatePixOrder](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.PaymentsService.CreatePixOrder). It accepts optional [params](https://buf.build/linq/linq/docs/main:linq.money.payments.v1#linq.money.payments.v1.PixRequest) - tax_id and address. Tax id is Brazilian CPF number (ask if validation rules are required). Address - country is 2-letter code of Brazil (BR), region is 2-letter code of Brazilian state (ask if list of states with their full names are required).
 

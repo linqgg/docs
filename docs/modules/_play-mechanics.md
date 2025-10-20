@@ -51,7 +51,7 @@ To use the tournament management API, follow these steps:
 #### Initiate a Session
 
   ```typescript
-    const remoteSession = await sessionService.initiate({ 
+    const remoteSession = await sessionService.initiate({
       title: "High Stakes",
       seats: 5,
       entry: 250, // 2.5$
@@ -63,7 +63,7 @@ To use the tournament management API, follow these steps:
   ```
 
 #### Join a Player
-  
+
   ```typescript
     const remotePlayer = await playerService.join({
       session: tournament.remote,
@@ -79,7 +79,7 @@ To use the tournament management API, follow these steps:
   ```
 
 #### Complete the Session
-  
+
   ```typescript
     //...
     positions.push(new Position({

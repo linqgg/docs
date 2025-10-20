@@ -15,7 +15,7 @@ Checking the location using the user's coordinates is carried out to ensure the 
 
 ## IP verification
 
-To check access over IP, the `RestrictionsService` service is used, which provides the `isAccessAllowed` method
+To check access over IP, the [RestrictionsService](https://buf.build/linq/linq/docs/main:linq.geo.restrictions.v2#linq.geo.restrictions.v2.RestrictionsService) service is used, which provides the [IsAccessAllowed](https://buf.build/linq/linq/docs/main:linq.geo.restrictions.v2#linq.geo.restrictions.v2.RestrictionsService.IsAccessAllowed) method
 
 <!-- ### List of countries and regions where transactions are restricted
 
@@ -44,4 +44,4 @@ const payload = await service.getAvoidedRegions({
 
 ## Check by GEO
 
-To check access to operations based on user coordinates, the LocationService service and the isOperationAllowed method are used.
+To check access to operations based on user coordinates, the [LocationService](https://buf.build/linq/linq/docs/main:linq.geo.operations.v1#linq.geo.operations.v1.LocationService) service and the [IsOperationAllowed](https://buf.build/linq/linq/docs/main:linq.geo.operations.v1#linq.geo.operations.v1.LocationService.isOperationAllowed) method are used.
